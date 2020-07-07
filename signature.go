@@ -84,12 +84,16 @@ type Session struct {
 
 	// Raw data that will be sent back in the confirmation.
 	Data string
+
+	// The transaction type, e.g a refund.
+	Type TransactionType
 }
 
 type TransactionType int64
 
 const (
 	TransactionTypeSimpleAuthorization = TransactionType(0)
+	TransactionTypeRefund              = TransactionType(3)
 )
 
 type Currency int64
@@ -134,7 +138,7 @@ func Sign(ctx context.Context, merchant Merchant, session Session) (Signed, erro
 	params := tpvRequest{
 		MerchantCode:    merchant.Code,
 		Terminal:        merchant.Terminal,
-		TransactionType: TransactionTypeSimpleAuthorization,
+		TransactionType: session.Type,
 		Amount:          session.Amount,
 		Currency:        CurrencyEuros,
 		Order:           session.Code,
